@@ -33,7 +33,7 @@ end
 
 local Library = {}
 
-Library.NewWindow = function(project_name, scalable, exit_func)
+Library.NewWindow = function(project_name, window_size, scalable, exit_func)
 
     local DESTROY_GUI = false
 
@@ -62,7 +62,7 @@ Library.NewWindow = function(project_name, scalable, exit_func)
     Main_Window.BorderSizePixel = 0
     Main_Window.ClipsDescendants = true
     Main_Window.Position = u2(0, 550, 0, 200)
-    Main_Window.Size = u2(0, 500, 0, 340)
+    Main_Window.Size = u2(0, window_size.X, 0, window_size.Y)
     Main_Window.Active = true
     Main_Window.Draggable = true
 
