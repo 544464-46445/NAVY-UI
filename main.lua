@@ -33,9 +33,13 @@ end
 
 local Library = {}
 
-Library.NewWindow = function(project_name, window_size, window_size_func, scalable, exit_func)
-
+Library.NewWindow = function(project_name, ui_info)
     local DESTROY_GUI = false
+
+    local window_size = ui_info.window_size or v2(500, 340)
+    local window_size_func = ui_info.window_size_func or function()end
+    local scalable = ui_info.scalable or true
+    local exit_func = ui_info.exit_func or function()end
 
     local RCX = new("ScreenGui")
     local Main_Window = new("Frame")
@@ -317,8 +321,8 @@ Library.NewWindow = function(project_name, window_size, window_size_func, scalab
             elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
                 Mouse_Scaling_X = false
                 Mouse_Scaling_Y = false
-                ScalingSideY.BackgroundTransparency = 0
-                ScalingSideX.BackgroundTransparency = 0
+                ScalingSideY.BackgroundTransparency = 1
+                ScalingSideX.BackgroundTransparency = 1
             end
         end)
 
