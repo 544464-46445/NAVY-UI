@@ -175,7 +175,6 @@ Library.NewWindow = function(project_name, ui_info)
     end
 
     -- HIDE UI
-
     local UI_Hid = false
     structurer.Hide = function()
         UI_Hid = not UI_Hid
@@ -195,7 +194,6 @@ Library.NewWindow = function(project_name, ui_info)
     Page_Holder.Size = u2(1, 0, 1, 0)
     Page_Holder.Position = u2(0.5, 0, 0, 0)
 
-    warn(tostring(Top_Bar_Title.TextBounds.X))
     local page_connection
     page_connection = RS.RenderStepped:Connect(function()
         if DESTROY_GUI then
@@ -215,6 +213,7 @@ Library.NewWindow = function(project_name, ui_info)
     Page_List_Layout.Parent = Page_Holder
     Page_List_Layout.FillDirection = Enum.FillDirection.Horizontal
     Page_List_Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    Page_List_Layout.Padding = UDim.new(0, 10)
     Page_List_Layout.SortOrder = Enum.SortOrder.LayoutOrder
 
     -- WINDOW SCALING
