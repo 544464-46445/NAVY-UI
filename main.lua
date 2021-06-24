@@ -33,7 +33,7 @@ end
 
 local Library = {}
 
-Library.NewWindow = function(project_name, scalable)
+Library.NewWindow = function(project_name, scalable, exit_func)
 
     local DESTROY_GUI = false
 
@@ -199,6 +199,7 @@ Library.NewWindow = function(project_name, scalable)
     local function CLOSE_UI()
         RCX:Destroy()
         DESTROY_GUI = true
+        exit_func()
     end
 
     Close_Button.MouseButton1Click:Connect(function()
