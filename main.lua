@@ -33,7 +33,7 @@ end
 
 local Library = {}
 
-Library.NewWindow = function(project_name, window_size, scalable, exit_func)
+Library.NewWindow = function(project_name, window_size, window_size_func, scalable, exit_func)
 
     local DESTROY_GUI = false
 
@@ -330,10 +330,12 @@ Library.NewWindow = function(project_name, window_size, scalable, exit_func)
                 local offset_mouse = Mouse.X - Main_Window.AbsolutePosition.X
 
                 Main_Window.Size = u2(0, clamp(offset_mouse, limit, math.huge), 0, Main_Window.AbsoluteSize.Y)
+                window_size_func(v2(Main_Window.AbsoluteSize.X, Main_Window.AbsoluteSize.Y))
             elseif UI_Toggled == false and Mouse_Scaling_Y then
                 local offset_mouse = Mouse.Y - Main_Window.AbsolutePosition.Y
 
                 Main_Window.Size = u2(0, Main_Window.AbsoluteSize.X, 0, clamp(offset_mouse, 100, math.huge))
+                window_size_func(v2(Main_Window.AbsoluteSize.X, Main_Window.AbsoluteSize.Y))
             else
                 if UI_Toggled then
                     ScalingSideY.Visible = false
