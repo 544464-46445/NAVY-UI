@@ -210,6 +210,14 @@ Library.NewWindow = function(project_name, scalable, exit_func)
         CLOSE_UI()
     end
 
+    -- HIDE UI
+
+    local UI_Hid = false
+    structurer.Hide = function()
+        UI_Hid = not UI_Hid
+        RCX.Enabled = not UI_Hid
+    end
+
     -- PAGE SELECTOR 
     Page_Selector.MouseButton1Click:Connect(function()
         Page_Container.Visible = not Page_Container.Visible
