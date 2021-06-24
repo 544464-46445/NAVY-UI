@@ -64,7 +64,6 @@ Library.NewWindow = function(project_name, ui_info)
     Main_Window.Position = u2(0, 550, 0, 200)
     Main_Window.Size = u2(0, window_size.X, 0, window_size.Y)
     Main_Window.Active = true
-    Main_Window.Draggable = true
 
     Pages.Name = "Pages"
     Pages.Parent = Main_Window
@@ -188,6 +187,7 @@ Library.NewWindow = function(project_name, ui_info)
     Page_Holder.Name = "Page_Holder"
     Page_Holder.Parent = Top_Bar
     Page_Holder.Active = true
+    Page_Holder.AutomaticCanvasSize = Enum.AutomaticSize.X
     Page_Holder.BackgroundColor3 = RGB(25, 26, 36)
     Page_Holder.BorderSizePixel = 0
 
@@ -199,11 +199,13 @@ Library.NewWindow = function(project_name, ui_info)
         if DESTROY_GUI then
             page_connection:Disconnect()
         else
-            Page_Holder.Size = u2(1, -Top_Bar_Title.TextBounds.X-60, 1, 0)
-            Page_Holder.Position = u2(0, Top_Bar_Title.TextBounds.X+4, 0, 0)
+            local newx = Top_Bar_Title.TextBounds.X
+            Page_Holder.Size = u2(1, -(newx+30)-55, 1, 0)
+            Page_Holder.Position = u2(0, newx+30, 0, 0)
         end
     end)
 
+    Page_Holder.ScrollingDirection = Enum.ScrollingDirection.X
     Page_Holder.ZIndex = 10001
     Page_Holder.CanvasSize = u2(0, 0, 1, 0)
     Page_Holder.ScrollBarImageColor3 = RGB(207, 207, 222)
@@ -216,8 +218,39 @@ Library.NewWindow = function(project_name, ui_info)
     Page_List_Layout.Padding = UDim.new(0, 10)
     Page_List_Layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    -- WINDOW SCALING
+    -- WINDOW DRAGGING
+    local Dragging_UI
+    local Previous_Offset
 
+    local drag_connection
+    drag_connection = UIS.InputChanged:Connect(function(input)
+        if DESTROY_GUI then
+            drag_connection:Disconnect()
+        elseif Dragging_UI and input.UserInputType == Enum.UserInputType.MouseMovement then
+            TS:Create(Main_Window, tween(0.04, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = u2(0, Mouse.X + Previous_Offset.X, 0, Mouse.Y + Previous_Offset.Y)}):Play()
+        end
+    end)
+
+    local drag_input_connection_on
+    drag_input_connection_on = UIS.InputBegan:Connect(function(input)
+        if DESTROY_GUI then
+            drag_input_connection_on:Disconnect()
+        elseif input.UserInputType == Enum.UserInputType.MouseButton1 and MouseIn(Top_Bar) then
+            Previous_Offset = v2(Main_Window.AbsolutePosition.X, Main_Window.AbsolutePosition.Y) - v2(Mouse.X, Mouse.Y)
+            Dragging_UI = true
+        end
+    end)
+
+    local drag_input_connection_off
+    drag_input_connection_off = UIS.InputEnded:Connect(function(input)
+        if DESTROY_GUI then
+            drag_input_connection_off:Disconnect()
+        elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
+            Dragging_UI = false
+        end
+    end)
+
+    -- WINDOW SCALING
     if scalable then
         local ScalingSideX = new("TextButton")
         local ScalingSideY = new("TextButton")
@@ -263,7 +296,7 @@ Library.NewWindow = function(project_name, ui_info)
             ScalingSideX.BackgroundTransparency = 1
         end)
 
-        local limit = Top_Bar_Title.TextBounds.X+8 + 40 + 200
+        local limit = Top_Bar_Title.TextBounds.X+248
 
         local Mouse_Connection
         Mouse_Connection = UIS.InputEnded:Connect(function(input)
@@ -281,15 +314,15 @@ Library.NewWindow = function(project_name, ui_info)
         Scaling_Connection = RS.RenderStepped:Connect(function()
             if DESTROY_GUI then
                 Scaling_Connection:Disconnect()
-            elseif UI_Toggled == false and Mouse_Scaling_X then
-                local offset_mouse = Mouse.X - Main_Window.AbsolutePosition.X
-
-                Main_Window.Size = u2(0, clamp(offset_mouse, limit, math.huge), 0, Main_Window.AbsoluteSize.Y)
-                window_size_func(v2(Main_Window.AbsoluteSize.X, Main_Window.AbsoluteSize.Y))
             elseif UI_Toggled == false and Mouse_Scaling_Y then
                 local offset_mouse = Mouse.Y - Main_Window.AbsolutePosition.Y
 
                 Main_Window.Size = u2(0, Main_Window.AbsoluteSize.X, 0, clamp(offset_mouse, 100, math.huge))
+                window_size_func(v2(Main_Window.AbsoluteSize.X, Main_Window.AbsoluteSize.Y))
+            elseif UI_Toggled == false and Mouse_Scaling_X then
+                local offset_mouse = Mouse.X - Main_Window.AbsolutePosition.X
+
+                Main_Window.Size = u2(0, clamp(offset_mouse, limit, math.huge), 0, Main_Window.AbsoluteSize.Y)
                 window_size_func(v2(Main_Window.AbsoluteSize.X, Main_Window.AbsoluteSize.Y))
             else
                 if UI_Toggled then
@@ -429,10 +462,10 @@ Library.NewWindow = function(project_name, ui_info)
 
         Page_Option.Name = page_name
         Page_Option.Parent = Page_Holder
-        Page_Option.BackgroundColor3 = RGB(255, 255, 255)
+        Page_Option.BackgroundColor3 = RGB(58, 58, 85)
         Page_Option.BackgroundTransparency = 1.000
         Page_Option.Text = page_name
-        Page_Option.ZIndex = 10002
+        Page_Option.ZIndex = 10003
         Page_Option.AutoButtonColor = false
         Page_Option.Font = Enum.Font.SourceSans
         Page_Option.TextColor3 = RGB(200, 200, 214)
@@ -468,8 +501,10 @@ Library.NewWindow = function(project_name, ui_info)
                 if not v:IsA("UIListLayout") then
                     if v.Name == Page_Option.Name then
                         v.TextColor3 = RGB(255, 255, 255)
+                        TS:Create(v, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = 0.75}):Play()
                     else
                         v.TextColor3 = RGB(200, 200, 214)
+                        TS:Create(v, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = 1}):Play()
                     end
                 end
             end
