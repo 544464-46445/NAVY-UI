@@ -49,10 +49,6 @@ Library.NewWindow = function(project_name, ui_info)
     local Top_Bar_Title = new("TextLabel")
     local Close_Button = new("TextButton")
     local Minimize_Button = new("TextButton")
-    local Page_Selector = new("TextButton")
-    local Page_Selector_Arrow = new("ImageLabel")
-    local Page_Container = new("Frame")
-    local Page_Selector_List_Layout = new("UIListLayout")
 
     RCX.Name = project_name
     RCX.Parent = game.CoreGui
@@ -137,42 +133,6 @@ Library.NewWindow = function(project_name, ui_info)
     Minimize_Button.TextColor3 = RGB(207, 207, 222)
     Minimize_Button.TextSize = 17.000
 
-    Page_Selector.Name = "Page_Selector"
-    Page_Selector.Parent = Top_Bar
-    Page_Selector.BackgroundColor3 = RGB(25, 26, 36)
-    Page_Selector.BorderColor3 = RGB(58, 58, 85)
-    Page_Selector.Position = u2(0.5, -75, 0, 4)
-    Page_Selector.Size = u2(0, 150, 0, 22)
-    Page_Selector.ZIndex = 10003
-    Page_Selector.AutoButtonColor = false
-    Page_Selector.Font = Enum.Font.SourceSans
-    Page_Selector.Text = "None"
-    Page_Selector.TextColor3 = RGB(207, 207, 222)
-    Page_Selector.TextSize = 14.000
-
-    Page_Selector_Arrow.Name = "Page_Selector_Arrow"
-    Page_Selector_Arrow.Parent = Page_Selector
-    Page_Selector_Arrow.BackgroundColor3 = RGB(255, 255, 255)
-    Page_Selector_Arrow.BackgroundTransparency = 1.000
-    Page_Selector_Arrow.Position = u2(1, -15, 0.5, -3)
-    Page_Selector_Arrow.Size = u2(0, 10, 0, 6)
-    Page_Selector_Arrow.ZIndex = 10004
-    Page_Selector_Arrow.Image = "rbxassetid://6820979846"
-    Page_Selector_Arrow.ImageColor3 = RGB(207, 207, 222)
-
-    Page_Container.Name = "Page_Container"
-    Page_Container.Parent = Page_Selector
-    Page_Container.BackgroundColor3 = RGB(255, 255, 255)
-    Page_Container.BackgroundTransparency = 1.000
-    Page_Container.Position = u2(0, 0, 1, 1)
-    Page_Container.Size = u2(1, 0, 1, 0)
-    Page_Container.Visible = false
-    Page_Container.ZIndex = 10002
-
-    Page_Selector_List_Layout.Name = "Page_Selector_List_Layout"
-    Page_Selector_List_Layout.Parent = Page_Container
-    Page_Selector_List_Layout.SortOrder = Enum.SortOrder.LayoutOrder
-
     local structurer = {}
 
     -- TOGGLE UI
@@ -223,47 +183,39 @@ Library.NewWindow = function(project_name, ui_info)
     end
 
     -- PAGE SELECTOR 
-    Page_Selector.MouseButton1Click:Connect(function()
-        Page_Container.Visible = not Page_Container.Visible
-        if Page_Container.Visible then
-            Page_Selector_Arrow.Rotation = 90
-        else
-            Page_Selector_Arrow.Rotation = 0
-        end
-    end)
+    local Page_Holder = new("ScrollingFrame")
+    local Page_List_Layout = new("UIListLayout")
 
-    Page_Selector.MouseEnter:Connect(function()
-        TS:Create(Page_Selector, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(20, 21, 31)}):Play()
-    end)
+    Page_Holder.Name = "Page_Holder"
+    Page_Holder.Parent = Top_Bar
+    Page_Holder.Active = true
+    Page_Holder.BackgroundColor3 = RGB(25, 26, 36)
+    Page_Holder.BorderSizePixel = 0
 
-    Page_Selector.MouseLeave:Connect(function()
-        TS:Create(Page_Selector, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(25, 26, 36)}):Play()
-    end)
+    Page_Holder.Size = u2(1, 0, 1, 0)
+    Page_Holder.Position = u2(0.5, 0, 0, 0)
 
-    local Page_Container_Connection 
-    Page_Container_Connection = UIS.InputBegan:Connect(function(input)
+    warn(tostring(Top_Bar_Title.TextBounds.X))
+    local page_connection
+    page_connection = RS.RenderStepped:Connect(function()
         if DESTROY_GUI then
-            Page_Container_Connection:Disconnect()
-        elseif (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.MouseButton2) and Page_Container.Visible and MouseIn(Page_Selector) == false and MouseIn(Page_Container) == false then
-            local inside_selector = true
-            local p_table = Pages:GetChildren()
-            for i = 1, #p_table do
-                local v = p_table[i]
-                if not v:IsA("UIListLayout") then
-                    if MouseIn(v) then
-                        inside_selector = true
-                        break
-                    else
-                        inside_selector = false
-                    end
-                end
-            end  
-            if inside_selector == false then
-                Page_Container.Visible = false
-                Page_Selector_Arrow.Rotation = 0
-            end
+            page_connection:Disconnect()
+        else
+            Page_Holder.Size = u2(1, -Top_Bar_Title.TextBounds.X-60, 1, 0)
+            Page_Holder.Position = u2(0, Top_Bar_Title.TextBounds.X+4, 0, 0)
         end
     end)
+
+    Page_Holder.ZIndex = 10001
+    Page_Holder.CanvasSize = u2(0, 0, 1, 0)
+    Page_Holder.ScrollBarImageColor3 = RGB(207, 207, 222)
+    Page_Holder.ScrollBarThickness = 1
+
+    Page_List_Layout.Name = "Page_List_Layout"
+    Page_List_Layout.Parent = Page_Holder
+    Page_List_Layout.FillDirection = Enum.FillDirection.Horizontal
+    Page_List_Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    Page_List_Layout.SortOrder = Enum.SortOrder.LayoutOrder
 
     -- WINDOW SCALING
 
@@ -477,16 +429,17 @@ Library.NewWindow = function(project_name, ui_info)
         local Page_Option = new("TextButton")
 
         Page_Option.Name = page_name
-        Page_Option.Parent = Page_Container
-        Page_Option.BackgroundColor3 = RGB(25, 26, 36)
-        Page_Option.BorderColor3 = RGB(58, 58, 85)
-        Page_Option.Size = u2(0, 150, 0, 22)
-        Page_Option.ZIndex = 10001
+        Page_Option.Parent = Page_Holder
+        Page_Option.BackgroundColor3 = RGB(255, 255, 255)
+        Page_Option.BackgroundTransparency = 1.000
+        Page_Option.Text = page_name
+        Page_Option.ZIndex = 10002
         Page_Option.AutoButtonColor = false
         Page_Option.Font = Enum.Font.SourceSans
-        Page_Option.Text = page_name
-        Page_Option.TextColor3 = RGB(207, 207, 222)
-        Page_Option.TextSize = 13.000
+        Page_Option.TextColor3 = RGB(200, 200, 214)
+        Page_Option.TextSize = 14.000
+
+        Page_Option.Size = u2(0, Page_Option.TextBounds.X+8, 1, 0)
 
         -- REAL PAGE
         local Page_Real = new("ScrollingFrame")
@@ -509,18 +462,18 @@ Library.NewWindow = function(project_name, ui_info)
         Page_ListLayout.Parent = Page_Real
         Page_ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-        Page_Option.MouseEnter:Connect(function()
-            TS:Create(Page_Option, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(20, 21, 31)}):Play()
-        end)
-    
-        Page_Option.MouseLeave:Connect(function()
-            TS:Create(Page_Option, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(25, 26, 36)}):Play()
-        end)
-
         local function SELECT_PAGE()
-            Page_Selector.Text = page_name
-            Page_Container.Visible = not Page_Container.Visible
-            Page_Selector_Arrow.Rotation = 0
+            local t1 = Page_Holder:GetChildren()
+            for i1 = 1, #t1 do
+                local v = t1[i1]
+                if not v:IsA("UIListLayout") then
+                    if v.Name == Page_Option.Name then
+                        v.TextColor3 = RGB(255, 255, 255)
+                    else
+                        v.TextColor3 = RGB(200, 200, 214)
+                    end
+                end
+            end
             local t2 = Pages:GetChildren()
             for i2 = 1, #t2 do
                 local v = t2[i2]
@@ -540,7 +493,6 @@ Library.NewWindow = function(project_name, ui_info)
 
         page_funcs.Select = function()
             SELECT_PAGE()
-            Page_Container.Visible = false
         end
 
         page_funcs.NewCategory = function(category_name)
