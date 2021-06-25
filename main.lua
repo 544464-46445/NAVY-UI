@@ -1,3 +1,5 @@
+-- MADE BY Blissful#4992 ON DISCORD / CornCatCornDog ON V3RMILLION
+
 -- LUA FUNCTIONS
 local clamp = math.clamp
 local round = math.round
