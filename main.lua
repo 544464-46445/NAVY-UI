@@ -842,16 +842,18 @@ Library.NewWindow = function(project_name, ui_info)
                     end
                 end)
 
-                local min = info.min or 0
-                local max = info.max or 100
+                local min = info.min
+                local max = info.max
                 local difference = max - min
-                local function Place(val)
-                    val = clamp(val, min, max)
-                    local offset = val*Bar.AbsoluteSize.X/difference
-                    Filled.Size = u2(0, clamp(offset, 0, Bar.AbsoluteSize.X+1), 0, 4)
+
+                local function PlaceValue(val)
+                    local newval = clamp(val, min, max)
+                    local offset = (newval - min) * Bar.AbsoluteSize.X / difference
+                    Slider_Value.Text = tostring(newval)..tostring(suffix)
+                    Filled.Size = u2(0, clamp(offset, 0, Bar.AbsoluteSize.X), 0, 4)
                 end
 
-                Place(current_value)
+                PlaceValue(current_value, 0)
 
                 local previous_value = nil
                 local slider_connection 
@@ -861,36 +863,34 @@ Library.NewWindow = function(project_name, ui_info)
                     elseif Dragging then
                         -- PLACING
                         local offset = Mouse.X - Bar.AbsolutePosition.X
-                        Filled.Size = u2(0, clamp(offset, 0, Bar.AbsoluteSize.X+1), 0, 4)
+                        local new_x = clamp(offset, 0, Bar.AbsoluteSize.X)
                         
                         -- CALCULATIONS
-                        local outcome = nil
-                        outcome = clamp(round(Filled.AbsoluteSize.X * difference / Bar.AbsoluteSize.X), min, max)
                         if decimals >= 1 then
                             local str = "1"
                             for i = 1, decimals do 
                                 str = str.."0"
                             end
-                            outcome = clamp(round((Filled.AbsoluteSize.X * difference / Bar.AbsoluteSize.X) * tonumber(str))/tonumber(str), min, max)
+                            current_value = round((new_x * difference / Bar.AbsoluteSize.X + min) * tonumber(str))/tonumber(str)
+                        else
+                            current_value = new_x * difference / Bar.AbsoluteSize.X + min
                         end
-                        current_value = outcome
-                        Slider_Value.Text = tostring(outcome)..tostring(suffix)
-                        if previous_value ~= outcome then
-                            CallBack(outcome)
-                            previous_value = outcome
+
+                        if previous_value ~= current_value then
+                            CallBack(current_value)
+                            previous_value = current_value
                         end
-                        Place(current_value)
+                        PlaceValue(current_value)
                     else 
-                        Place(current_value)
+                        PlaceValue(current_value)
                     end
                 end)
                 local slider_funcs = {}
 
                 slider_funcs.SetValue = function(val)
-                    CallBack(clamp(val, min, max))
                     current_value = clamp(val, min, max)
-                    Slider_Value.Text = tostring(current_value)..tostring(suffix)
-                    Place(current_value)
+                    CallBack(current_value)
+                    PlaceValue(current_value)
                 end
                 return slider_funcs
             end
