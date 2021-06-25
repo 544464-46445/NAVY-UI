@@ -748,8 +748,20 @@ Library.NewWindow = function(project_name, ui_info)
                 if CallBack ~= nil and info ~= nil then else return end
 
                 local decimals = info.decimals or 1
+                local function RoundValue(val)
+                    if decimals >= 1 then
+                        local str = "1"
+                        for i = 1, decimals do 
+                            str = str.."0"
+                        end
+                        return round(val * tonumber(str))/tonumber(str)
+                    else
+                        return round(val)
+                    end
+                end
+
                 local suffix = info.suffix or ""
-                local current_value = info.default or ((info.min + info.max)/2)
+                local current_value = RoundValue(info.default or ((info.min + info.max)/2))
 
                 local Slider = new("Frame")
                 local Slider_Title = new("TextLabel")
@@ -855,7 +867,7 @@ Library.NewWindow = function(project_name, ui_info)
                     Filled.Size = u2(0, clamp(offset, 0, Bar.AbsoluteSize.X), 0, 4)
                 end
 
-                PlaceValue(current_value, 0)
+                PlaceValue(current_value)
 
                 local previous_value = nil
                 local slider_connection 
@@ -873,9 +885,9 @@ Library.NewWindow = function(project_name, ui_info)
                             for i = 1, decimals do 
                                 str = str.."0"
                             end
-                            current_value = round((new_x * difference / Bar.AbsoluteSize.X + min) * tonumber(str))/tonumber(str)
+                            current_value = RoundValue(new_x * difference / Bar.AbsoluteSize.X + min)
                         else
-                            current_value = round(new_x * difference / Bar.AbsoluteSize.X + min)
+                            current_value = RoundValue(new_x * difference / Bar.AbsoluteSize.X + min)
                         end
 
                         if previous_value ~= current_value then
