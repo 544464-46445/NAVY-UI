@@ -873,7 +873,7 @@ Library.NewWindow = function(project_name, ui_info)
                             end
                             current_value = round((new_x * difference / Bar.AbsoluteSize.X + min) * tonumber(str))/tonumber(str)
                         else
-                            current_value = new_x * difference / Bar.AbsoluteSize.X + min
+                            current_value = round(new_x * difference / Bar.AbsoluteSize.X + min)
                         end
 
                         if previous_value ~= current_value then
