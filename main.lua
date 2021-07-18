@@ -51,6 +51,7 @@ Library.NewWindow = function(project_name, ui_info)
     local Top_Bar_Title = new("TextLabel")
     local Close_Button = new("TextButton")
     local Minimize_Button = new("TextButton")
+    local Credits = new("TextLabel")
 
     RCX.Name = project_name
     RCX.Parent = game.CoreGui
@@ -67,14 +68,27 @@ Library.NewWindow = function(project_name, ui_info)
     Main_Window.Size = u2(0, window_size.X, 0, window_size.Y)
     Main_Window.Active = true
 
+    Credits.Name = "Credits"
+    Credits.Parent = Main_Window
+    Credits.BackgroundTransparency = 1
+    Credits.Active = false
+    Credits.Size = u2(0, 1, 0, 10)
+    Credits.Font = Enum.Font.SourceSans
+    Credits.Text = "Made by Blissful#4992"
+    Credits.TextColor3 = RGB(207, 207, 222)
+    Credits.TextSize = 12
+    Credits.TextXAlignment = Enum.TextXAlignment.Left
+    Credits.ZIndex = 2
+    Credits.Position = u2(0.5, -Credits.TextBounds.X/2, 1, -15)
+
     Pages.Name = "Pages"
     Pages.Parent = Main_Window
     Pages.BackgroundColor3 = RGB(30, 32, 44)
     Pages.BorderColor3 = RGB(26, 28, 40)
     Pages.BorderSizePixel = 5
     Pages.ClipsDescendants = true
-    Pages.Position = u2(0, 10, 0, 40)
-    Pages.Size = u2(1, -20, 1, -50)
+    Pages.Position = u2(0, 10, 0, 50)
+    Pages.Size = u2(1, -20, 1, -70)
     Pages.ZIndex = 2
 
     Top_Bar.Name = "Top_Bar"
@@ -190,22 +204,12 @@ Library.NewWindow = function(project_name, ui_info)
     Page_Holder.Parent = Top_Bar
     Page_Holder.Active = true
     Page_Holder.AutomaticCanvasSize = Enum.AutomaticSize.X
+    Page_Holder.BackgroundTransparency = 1
     Page_Holder.BackgroundColor3 = RGB(25, 26, 36)
     Page_Holder.BorderSizePixel = 0
 
     Page_Holder.Size = u2(1, 0, 1, 0)
-    Page_Holder.Position = u2(0.5, 0, 0, 0)
-
-    local page_connection
-    page_connection = RS.RenderStepped:Connect(function()
-        if DESTROY_GUI then
-            page_connection:Disconnect()
-        else
-            local newx = Top_Bar_Title.TextBounds.X
-            Page_Holder.Size = u2(1, -(newx+30)-55, 1, 0)
-            Page_Holder.Position = u2(0, newx+30, 0, 0)
-        end
-    end)
+    Page_Holder.Position = u2(0, 0, 0, 0)
 
     Page_Holder.ScrollingDirection = Enum.ScrollingDirection.X
     Page_Holder.ZIndex = 10001
@@ -257,7 +261,7 @@ Library.NewWindow = function(project_name, ui_info)
         local ScalingSideX = new("TextButton")
         local ScalingSideY = new("TextButton")
 
-        ScalingSideY.Name = "ScalingSideX"
+        ScalingSideY.Name = "ScalingSideY"
         ScalingSideY.Parent = Main_Window
         ScalingSideY.BackgroundColor3 = RGB(58, 58, 85)
         ScalingSideY.BackgroundTransparency = 1
@@ -270,13 +274,13 @@ Library.NewWindow = function(project_name, ui_info)
         ScalingSideY.Text = ""
         ScalingSideY.TextSize = 14.000
 
-        ScalingSideX.Name = "ScalingSideY"
+        ScalingSideX.Name = "ScalingSideX"
         ScalingSideX.Parent = Main_Window
         ScalingSideX.BackgroundColor3 = RGB(58, 58, 85)
         ScalingSideX.BackgroundTransparency = 1
         ScalingSideX.BorderSizePixel = 0
-        ScalingSideX.Position = u2(1, -5, 0, 0)
-        ScalingSideX.Size = u2(0, 10, 1, 0)
+        ScalingSideX.Position = u2(1, -5, 0, 31)
+        ScalingSideX.Size = u2(0, 10, 1, -31)
         ScalingSideX.Font = Enum.Font.SourceSans
         ScalingSideX.AutoButtonColor = false
         ScalingSideX.Text = ""
