@@ -772,7 +772,7 @@ Library.NewWindow = function(project_name, ui_info)
                 local Detector = new("TextButton")
                 local Bar = new("Frame")
                 local Filled = new("Frame")
-                local Slider_Value = new("TextLabel")
+                local Slider_Value = new("TextBox")
 
                 Slider.Name = slider_name
                 Slider.Parent = Options_Holder
@@ -828,10 +828,13 @@ Library.NewWindow = function(project_name, ui_info)
                 Slider_Value.Parent = Slider
                 Slider_Value.BackgroundColor3 = RGB(255, 255, 255)
                 Slider_Value.BackgroundTransparency = 1.000
-                Slider_Value.Position = u2(0.699999988, -20, 0, 0)
-                Slider_Value.Size = u2(0, 1, 1, 0)
+                Slider_Value.Position = u2(0.699999988, -50, 0, 0)
+                Slider_Value.Size = u2(0, 30, 1, 0)
                 Slider_Value.ZIndex = 5
                 Slider_Value.Font = Enum.Font.SourceSans
+                Slider_Value.ClearTextOnFocus = false
+                Slider_Value.PlaceholderText = ""
+                Slider_Value.Text = ""
                 
                 if decimals > 1 then
                     local str = "1"
@@ -867,18 +870,22 @@ Library.NewWindow = function(project_name, ui_info)
                 local function PlaceValue(val)
                     local newval = clamp(val, min, max)
                     local offset = (newval - min) * Bar.AbsoluteSize.X / difference
-                    Slider_Value.Text = tostring(newval)..tostring(suffix)
+                    if Slider_Value.Text ~= tostring(newval)..tostring(suffix) then
+                        Slider_Value.Text = tostring(newval)..tostring(suffix)
+                    end
                     Filled.Size = u2(0, clamp(offset, 0, Bar.AbsoluteSize.X), 0, 4)
                 end
 
                 PlaceValue(current_value)
+
+                local Editing = false
 
                 local previous_value = nil
                 local slider_connection 
                 slider_connection = RS.RenderStepped:Connect(function()
                     if DESTROY_GUI then
                         slider_connection:Disconnect()
-                    elseif Dragging then
+                    elseif Dragging and not Editing then
                         -- PLACING
                         local offset = Mouse.X - Bar.AbsolutePosition.X
                         local new_x = clamp(offset, 0, Bar.AbsoluteSize.X)
@@ -899,10 +906,33 @@ Library.NewWindow = function(project_name, ui_info)
                             previous_value = current_value
                         end
                         PlaceValue(current_value)
-                    else 
+                    elseif not Editing then
                         PlaceValue(current_value)
                     end
                 end)
+
+                Slider_Value.Focused:Connect(function()
+                    Editing = true
+                end)
+
+                Slider_Value.FocusLost:Connect(function(enter)
+                    if enter then
+                        if tonumber(Slider_Value.Text) then
+                            current_value = clamp(Slider_Value.Text, min, max)
+                        else
+                            Slider_Value.Text = ""..tostring(suffix)
+                        end
+                    end
+                    Editing = false
+                end)
+
+                Slider_Value.Changed:Connect(function(property)
+                    if property == "Text" then
+                        local val = tonumber(sub(Slider_Value.Text, 1, #Slider_Value.Text-#suffix))
+                        current_value = clamp(val, min, max)
+                    end
+                end)
+
                 local slider_funcs = {}
 
                 slider_funcs.SetValue = function(val)
