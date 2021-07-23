@@ -878,14 +878,12 @@ Library.NewWindow = function(project_name, ui_info)
 
                 PlaceValue(current_value)
 
-                local Editing = false
-
                 local previous_value = nil
                 local slider_connection 
                 slider_connection = RS.RenderStepped:Connect(function()
                     if DESTROY_GUI then
                         slider_connection:Disconnect()
-                    elseif Dragging and not Editing then
+                    elseif Dragging then
                         -- PLACING
                         local offset = Mouse.X - Bar.AbsolutePosition.X
                         local new_x = clamp(offset, 0, Bar.AbsoluteSize.X)
@@ -906,30 +904,8 @@ Library.NewWindow = function(project_name, ui_info)
                             previous_value = current_value
                         end
                         PlaceValue(current_value)
-                    elseif not Editing then
+                    else
                         PlaceValue(current_value)
-                    end
-                end)
-
-                Slider_Value.Focused:Connect(function()
-                    Editing = true
-                end)
-
-                Slider_Value.FocusLost:Connect(function(enter)
-                    if enter then
-                        if tonumber(Slider_Value.Text) then
-                            current_value = clamp(Slider_Value.Text, min, max)
-                        else
-                            Slider_Value.Text = ""..tostring(suffix)
-                        end
-                    end
-                    Editing = false
-                end)
-
-                Slider_Value.Changed:Connect(function(property)
-                    if property == "Text" then
-                        local val = tonumber(sub(Slider_Value.Text, 1, #Slider_Value.Text-#suffix))
-                        current_value = clamp(val, min, max)
                     end
                 end)
 
