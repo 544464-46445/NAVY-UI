@@ -772,7 +772,7 @@ Library.NewWindow = function(project_name, ui_info)
                 local Detector = new("TextButton")
                 local Bar = new("Frame")
                 local Filled = new("Frame")
-                local Slider_Value = new("TextBox")
+                local Slider_Value = new("TextLabel")
 
                 Slider.Name = slider_name
                 Slider.Parent = Options_Holder
