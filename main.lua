@@ -832,9 +832,6 @@ Library.NewWindow = function(project_name, ui_info)
                 Slider_Value.Size = u2(0, 30, 1, 0)
                 Slider_Value.ZIndex = 5
                 Slider_Value.Font = Enum.Font.SourceSans
-                Slider_Value.ClearTextOnFocus = false
-                Slider_Value.PlaceholderText = ""
-                Slider_Value.Text = ""
                 
                 if decimals > 1 then
                     local str = "1"
