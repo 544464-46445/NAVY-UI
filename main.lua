@@ -257,6 +257,7 @@ Library.NewWindow = function(project_name, ui_info)
     end)
 
     -- WINDOW SCALING
+    local limit = Top_Bar_Title.TextBounds.X+228
     if scalable then
         local ScalingSideX = new("TextButton")
         local ScalingSideY = new("TextButton")
@@ -301,8 +302,6 @@ Library.NewWindow = function(project_name, ui_info)
             ScalingSideY.BackgroundTransparency = 0
             ScalingSideX.BackgroundTransparency = 1
         end)
-
-        local limit = Top_Bar_Title.TextBounds.X+248
 
         local Mouse_Connection
         Mouse_Connection = UIS.InputEnded:Connect(function(input)
@@ -533,6 +532,18 @@ Library.NewWindow = function(project_name, ui_info)
 
         page_funcs.Select = function()
             SELECT_PAGE()
+        end
+
+        do
+            local offset = 0
+
+            for i,v in pairs(Page_Holder:GetChildren()) do
+                if v:IsA("TextButton") then
+                    offset = offset + v.AbsoluteSize.X
+                end
+            end
+
+            limit = (Top_Bar_Title.TextBounds.X*1.75) + (offset*1.75)
         end
 
         page_funcs.NewCategory = function(category_name)
@@ -981,10 +992,10 @@ Library.NewWindow = function(project_name, ui_info)
                     local connection
                     local connection2
 
-                    connection = UIS.InputBegan:Connect(function(input)
+                    connection = UIS.InputBegan:Connect(function(input, gameProcessed)
                         if DESTROY_GUI then
                             connection:Disconnect()
-                        elseif input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode ~= Enum.KeyCode.Backspace then
+                        elseif not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode ~= Enum.KeyCode.Backspace then
                             local newkey = false
                             if Current_Keybind ~= input.KeyCode then
                                 newkey = true
@@ -996,14 +1007,15 @@ Library.NewWindow = function(project_name, ui_info)
                                 KeyCallBack(Current_Keybind)
                             end
                             connection:Disconnect()
+                            connection2:Disconnect()
                             wait()
                             Selecting = false
                         end
                     end)
-                    connection2 = UIS.InputBegan:Connect(function(input)
+                    connection2 = UIS.InputBegan:Connect(function(input, gameProcessed)
                         if DESTROY_GUI then
                             connection2:Disconnect()
-                        elseif input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Backspace then
+                        elseif not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Backspace then
                             Detector.Text = "None"
                             SCALE()
                             Current_Keybind = nil
@@ -1017,10 +1029,10 @@ Library.NewWindow = function(project_name, ui_info)
                 end)
 
                 local c
-                c = UIS.InputBegan:Connect(function(input)
+                c = UIS.InputBegan:Connect(function(input, gameProcessed)
                     if DESTROY_GUI then
                         c:Disconnect()
-                    elseif input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Current_Keybind and Selecting == false then
+                    elseif not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Current_Keybind and Selecting == false then
                         CallBack()
                     end
                 end)
@@ -1233,13 +1245,15 @@ Library.NewWindow = function(project_name, ui_info)
                 end)
 
                 local detect_inside
-                detect_inside = UIS.InputBegan:Connect(function(input)
+                detect_inside = UIS.InputBegan:Connect(function(input, gameProcessed)
                     if DESTROY_GUI then
                         detect_inside:Disconnect()
-                    elseif input.UserInputType == Enum.UserInputType.MouseButton2 and PickerFrame.Visible == true and MouseIn(PickerFrame) == false then
-                        PickerFrame.Visible = false
-                    elseif input.UserInputType == Enum.UserInputType.MouseButton1 and PickerFrame.Visible == true and MouseIn(Detector) == false and MouseIn(PickerFrame) == false then
-                        PickerFrame.Visible = false
+                    elseif not gameProcessed then
+                        if input.UserInputType == Enum.UserInputType.MouseButton2 and PickerFrame.Visible == true and MouseIn(PickerFrame) == false then
+                            PickerFrame.Visible = false
+                        elseif input.UserInputType == Enum.UserInputType.MouseButton1 and PickerFrame.Visible == true and MouseIn(Detector) == false and MouseIn(PickerFrame) == false then
+                            PickerFrame.Visible = false
+                        end
                     end
                 end)
 
@@ -1458,10 +1472,10 @@ Library.NewWindow = function(project_name, ui_info)
                 end)
 
                 local detect_inside_dropdown
-                detect_inside_dropdown = UIS.InputBegan:Connect(function(input)
+                detect_inside_dropdown = UIS.InputBegan:Connect(function(input, gameProcessed)
                     if DESTROY_GUI then
                         detect_inside_dropdown:Disconnect()
-                    elseif (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.MouseButton2) and Options_Container.Visible and MouseIn(Detector) == false and MouseIn(Options_Container) == false then
+                    elseif not gameProcessed and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.MouseButton2) and Options_Container.Visible and MouseIn(Detector) == false and MouseIn(Options_Container) == false then
                         local inside_selector = true
                         local d_table = Options_Container:GetChildren()
                         for i = 1, #d_table do
