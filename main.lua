@@ -1502,7 +1502,9 @@ Library.NewWindow = function(project_name, ui_info)
                     Dropdown_Arrow.Rotation = 0
                     Detector.Text = option
                 end
-                Select(current_option)
+                Options_Container.Visible = false
+                Dropdown_Arrow.Rotation = 0
+                Detector.Text = current_option
 
                 local function ReMap()
                     for _,v in pairs(Options_Container:GetChildren()) do
