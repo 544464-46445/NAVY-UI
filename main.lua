@@ -664,6 +664,77 @@ Library.NewWindow = function(project_name, ui_info)
                 TOGGLE_CATEGORY()
             end
 
+            cat_funcs.NewButton = function(button_name, CallBack)
+                if CallBack ~= nil then else return end
+
+                local Button = new("Frame")
+                local Button_Title = new("TextLabel")
+                local Detector = new("ImageButton")
+                local Click_Icon = new("ImageLabel")
+
+                Button.Name = button_name
+                Button.Parent = Options_Holder
+                Button.BackgroundColor3 = RGB(255, 255, 255)
+                Button.BackgroundTransparency = 1.000
+                Button.Size = u2(1, 0, 0, 25)
+                Button.ZIndex = 4
+
+                Button_Title.Name = "Button_Title"
+                Button_Title.Parent = Button
+                Button_Title.BackgroundColor3 = RGB(255, 255, 255)
+                Button_Title.BackgroundTransparency = 1.000
+                Button_Title.Position = u2(0, 10, 0, 0)
+                Button_Title.Size = u2(0, 1, 1, 0)
+                Button_Title.ZIndex = 5
+                Button_Title.Font = Enum.Font.SourceSans
+                Button_Title.Text = button_name
+                Button_Title.TextColor3 = RGB(255, 255, 255)
+                Button_Title.TextSize = 14
+                Button_Title.TextXAlignment = Enum.TextXAlignment.Left
+
+                Detector.Name = "Detector"
+                Detector.Parent = Button
+                Detector.BackgroundColor3 = RGB(25, 26, 36)
+                Detector.BackgroundTransparency = 0
+                Detector.BorderColor3 = RGB(58, 58, 85)
+                Detector.Position = u2(1, -30, 0.5, -10)
+                Detector.Size = u2(0, 20, 0, 20)
+                Detector.ZIndex = 5
+                Detector.AutoButtonColor = false
+                Detector.Image = ""
+
+                Click_Icon.Parent = Detector
+                Click_Icon.BackgroundTransparency = 1
+                Click_Icon.Position = u2(0.5, -8, 0.5, -8)
+                Click_Icon.Size = u2(0, 16, 0, 16)
+                Click_Icon.ZIndex = 6
+                Click_Icon.Image = "rbxassetid://7193825942"
+                Click_Icon.ImageColor3 = RGB(255, 255, 255)
+                Click_Icon.ScaleType = Enum.ScaleType.Fit
+
+                Detector.MouseEnter:Connect(function()
+                    TS:Create(Detector, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(20, 21, 31)}):Play()
+                    TS:Create(Click_Icon, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {ImageColor3 = RGB(200, 200, 200)}):Play()
+                end)
+            
+                Detector.MouseLeave:Connect(function()
+                    TS:Create(Detector, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(25, 26, 36)}):Play()
+                    TS:Create(Click_Icon, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {ImageColor3 = RGB(255, 255, 255)}):Play()
+                end)
+
+                Detector.MouseButton1Click:Connect(function()
+                    CallBack()
+                end)
+
+                local button_funcs = {}
+
+                button_funcs.Fire = function(n)
+                    for i = 1, n or 1 do
+                        CallBack()
+                    end
+                end
+            end
+
             cat_funcs.NewToggle = function(toggle_name, CallBack, info)
                 if CallBack ~= nil and info ~= nil then else return end
 
