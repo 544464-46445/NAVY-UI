@@ -21,7 +21,8 @@ local TS = game:GetService("TweenService")
 local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
-local Player = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
 local ColorModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/Blissful4992/Miscellaneous/main/ColorModule.lua"))()
@@ -1652,6 +1653,228 @@ Library.NewWindow = function(project_name, ui_info)
                 return dropdown_funcs
             end
 
+            cat_funcs.NewPlayerChipset = function(chip_set_name, CallBack, info)
+                if CallBack ~= nil then else return end
+
+                local Dropdown = new("Frame")
+                local Dropdown_Title = new("TextLabel")
+                local Detector = new("TextButton")
+                local Dropdown_Arrow = new("ImageLabel")
+                local Options_Container = new("Frame")
+                local Dropdown_List_Layout = new("UIListLayout")
+              
+                Dropdown.Name = chip_set_name
+                Dropdown.Parent = Options_Holder
+                Dropdown.BackgroundColor3 = RGB(255, 255, 255)
+                Dropdown.BackgroundTransparency = 1.000
+                Dropdown.Size = u2(1, 0, 0, 25)
+                Dropdown.ZIndex = 4
+
+                Dropdown_Title.Name = "Dropdown_Title"
+                Dropdown_Title.Parent = Dropdown
+                Dropdown_Title.BackgroundColor3 = RGB(255, 255, 255)
+                Dropdown_Title.BackgroundTransparency = 1.000
+                Dropdown_Title.Position = u2(0, 10, 0, 0)
+                Dropdown_Title.Size = u2(0, 1, 1, 0)
+                Dropdown_Title.ZIndex = 5
+                Dropdown_Title.Font = Enum.Font.SourceSans
+                Dropdown_Title.Text = chip_set_name
+                Dropdown_Title.TextColor3 = RGB(238, 238, 255)
+                Dropdown_Title.TextSize = 14.000
+                Dropdown_Title.TextXAlignment = Enum.TextXAlignment.Left
+
+                Detector.Name = "Detector"
+                Detector.Parent = Dropdown
+                Detector.BackgroundColor3 = RGB(25, 26, 36)
+                Detector.BorderColor3 = RGB(58, 58, 85)
+                Detector.Position = u2(1, -110, 0.5, -10)
+                Detector.Size = u2(0, 100, 0, 20)
+                Detector.ZIndex = 5
+                Detector.AutoButtonColor = false
+                Detector.Font = Enum.Font.SourceSans
+                Detector.Text = "Players"
+                Detector.TextColor3 = RGB(255, 255, 255)
+                Detector.TextSize = 13.000
+
+                Dropdown_Arrow.Name = "Dropdown_Arrow"
+                Dropdown_Arrow.Parent = Detector
+                Dropdown_Arrow.BackgroundColor3 = RGB(255, 255, 255)
+                Dropdown_Arrow.BackgroundTransparency = 1.000
+                Dropdown_Arrow.Position = u2(1, -15, 0.5, -2)
+                Dropdown_Arrow.Size = u2(0, 10, 0, 6)
+                Dropdown_Arrow.ZIndex = 5
+                Dropdown_Arrow.Image = "rbxassetid://6820979846"
+                Dropdown_Arrow.ImageColor3 = RGB(238, 238, 255)
+
+                Options_Container.Name = "Options_Container"
+                Options_Container.Parent = Detector
+                Options_Container.BackgroundColor3 = RGB(255, 255, 255)
+                Options_Container.BackgroundTransparency = 1.000
+                Options_Container.Position = u2(0, 0, 1, 1)
+                Options_Container.Size = u2(1, 0, 1, 0)
+                Options_Container.Visible = false
+                Options_Container.ZIndex = 15
+
+                Dropdown_List_Layout.Name = "Dropdown_List_Layout"
+                Dropdown_List_Layout.Parent = Options_Container
+                Dropdown_List_Layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+                Options_Container.Visible = false
+                Dropdown_Arrow.Rotation = 0
+
+                Detector.MouseEnter:Connect(function()
+                    TS:Create(Detector, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(20, 21, 31)}):Play()
+                end)
+            
+                Detector.MouseLeave:Connect(function()
+                    TS:Create(Detector, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(25, 26, 36)}):Play()
+                end)
+
+                Detector.MouseButton1Click:Connect(function()
+                    Options_Container.Visible = not Options_Container.Visible
+                    if Options_Container.Visible then
+                        Dropdown_Arrow.Rotation = 90
+                    else
+                        Dropdown_Arrow.Rotation = 0
+                    end
+                end)
+
+                local detect_inside_dropdown
+                detect_inside_dropdown = UIS.InputBegan:Connect(function(input, gameProcessed)
+                    if DESTROY_GUI then
+                        detect_inside_dropdown:Disconnect()
+                    elseif not gameProcessed and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.MouseButton2) and Options_Container.Visible and MouseIn(Detector) == false and MouseIn(Options_Container) == false then
+                        local inside_selector = true
+                        local d_table = Options_Container:GetChildren()
+                        for i = 1, #d_table do
+                            local v = d_table[i]
+                            if not v:IsA("UIListLayout") then
+                                if MouseIn(v) then
+                                    inside_selector = true
+                                    break
+                                else
+                                    inside_selector = false
+                                end
+                            end
+                        end  
+                        if inside_selector == false then
+                            Options_Container.Visible = false
+                            Dropdown_Arrow.Rotation = 0
+                        end
+                    end
+                end)
+
+                local player_table = {}
+
+                local max = 0
+                for i,v in pairs(Players:GetPlayers()) do
+                    if v.Name ~= Player.Name then
+                        local Option = new("TextButton")
+                        local player_name = v.Name
+
+                        Option.Name = "Option"
+                        Option.Parent = Options_Container
+                        Option.BackgroundColor3 = RGB(25, 26, 36)
+                        Option.BorderColor3 = RGB(58, 58, 85)
+                        Option.Size = u2(1, 0, 0, 20)
+                        Option.ZIndex = 16
+                        Option.AutoButtonColor = false
+                        Option.Font = Enum.Font.SourceSans
+                        Option.Text = player_name
+                        Option.TextColor3 = RGB(238, 238, 255)
+                        Option.TextSize = 13.000
+
+                        player_table[player_name] = false
+                        local current = false
+
+                        local function Toggle(bool)
+                            current = bool
+                            player_table[player_name] = current
+                            CallBack(player_table)
+                            if bool then
+                                TS:Create(Option, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(66, 107, 58)}):Play()
+                            else
+                                TS:Create(Option, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(25, 26, 36)}):Play()
+                            end
+                        end
+
+                        Option.MouseButton1Click:Connect(function()
+                            current = not current
+                            Toggle(current)
+                        end)
+
+                        if Option.TextBounds.X > max then
+                            max = Option.TextBounds.X
+
+                            Detector.Size = u2(0, max + 20, 0, 20)
+                            Detector.Position = u2(1, -Detector.AbsoluteSize.X-10, 0.5, -10)
+                        end
+
+                        local c_changed
+                        c_changed = v.AncestryChanged:connect(function()
+                            if not v:IsDescendantOf(game) then
+                                Option:Destroy()
+                            end
+                        end)
+                    end
+                end
+
+                local c_added
+                c_added = Players.PlayerAdded:Connect(function(v) 
+                    if DESTROY_GUI then
+                        c_added:Disconnect()
+                    elseif v.Name ~= Player.Name then
+                        local Option = new("TextButton")
+                        local player_name = v.Name
+
+                        Option.Name = "Option"
+                        Option.Parent = Options_Container
+                        Option.BackgroundColor3 = RGB(25, 26, 36)
+                        Option.BorderColor3 = RGB(58, 58, 85)
+                        Option.Size = u2(1, 0, 0, 20)
+                        Option.ZIndex = 16
+                        Option.AutoButtonColor = false
+                        Option.Font = Enum.Font.SourceSans
+                        Option.Text = player_name
+                        Option.TextColor3 = RGB(238, 238, 255)
+                        Option.TextSize = 13.000
+
+                        player_table[player_name] = false
+                        local current = false
+
+                        local function Toggle(bool)
+                            current = bool
+                            player_table[player_name] = current
+                            CallBack(player_table)
+                            if bool then
+                                TS:Create(Option, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(66, 107, 58)}):Play()
+                            else
+                                TS:Create(Option, tween(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = RGB(25, 26, 36)}):Play()
+                            end
+                        end
+
+                        Option.MouseButton1Click:Connect(function()
+                            current = not current
+                            Toggle(current)
+                        end)
+
+                        if Option.TextBounds.X > max then
+                            max = Option.TextBounds.X
+
+                            Detector.Size = u2(0, max + 20, 0, 20)
+                            Detector.Position = u2(1, -Detector.AbsoluteSize.X-10, 0.5, -10)
+                        end
+
+                        local c_changed
+                        c_changed = v.AncestryChanged:connect(function()
+                            if not v:IsDescendantOf(game) then
+                                Option:Destroy()
+                            end
+                        end)
+                    end
+                end)
+
+            end
             return cat_funcs
         end
         return page_funcs
