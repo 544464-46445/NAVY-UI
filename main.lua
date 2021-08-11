@@ -1653,7 +1653,7 @@ Library.NewWindow = function(project_name, ui_info)
                 return dropdown_funcs
             end
 
-            cat_funcs.NewPlayerChipset = function(chip_set_name, CallBack, info)
+            cat_funcs.NewPlayerChipset = function(chip_set_name, CallBack)
                 if CallBack ~= nil then else return end
 
                 local Dropdown = new("Frame")
