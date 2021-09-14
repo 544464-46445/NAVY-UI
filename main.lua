@@ -25,7 +25,7 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
-local ColorModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/Blissful4992/Miscellaneous/main/ColorModule.lua"))()
+local ColorModule = loadstring(game:HttpGet("https://pastebin.com/raw/v0J5ke3N"))()
 
 local function MouseIn(obj)
     if (Mouse.X < obj.AbsolutePosition.X or Mouse.X > obj.AbsolutePosition.X + obj.AbsoluteSize.X) or (Mouse.Y < obj.AbsolutePosition.Y or Mouse.Y > obj.AbsolutePosition.Y + obj.AbsoluteSize.Y) then
@@ -317,29 +317,38 @@ Library.NewWindow = function(project_name, ui_info)
         end)
 
         local Scaling_Connection
-        Scaling_Connection = RS.RenderStepped:Connect(function()
+        Scaling_Connection = function()
             if DESTROY_GUI then
                 Scaling_Connection:Disconnect()
             elseif UI_Toggled == false and Mouse_Scaling_Y then
                 local offset_mouse = Mouse.Y - Main_Window.AbsolutePosition.Y
 
-                Main_Window.Size = u2(0, Main_Window.AbsoluteSize.X, 0, clamp(offset_mouse, 100, math.huge))
+                TS:Create(Main_Window, tween(0.05, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = u2(0, Main_Window.AbsoluteSize.X, 0, clamp(offset_mouse, 100, math.huge))}):Play()
+                -- Main_Window.Size = u2(0, Main_Window.AbsoluteSize.X, 0, clamp(offset_mouse, 100, math.huge))
                 window_size_func(v2(Main_Window.AbsoluteSize.X, Main_Window.AbsoluteSize.Y))
             elseif UI_Toggled == false and Mouse_Scaling_X then
                 local offset_mouse = Mouse.X - Main_Window.AbsolutePosition.X
 
-                Main_Window.Size = u2(0, clamp(offset_mouse, limit, math.huge), 0, Main_Window.AbsoluteSize.Y)
+                TS:Create(Main_Window, tween(0.05, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = u2(0, clamp(offset_mouse, limit, math.huge), 0, Main_Window.AbsoluteSize.Y)}):Play()
+                -- Main_Window.Size = u2(0, clamp(offset_mouse, limit, math.huge), 0, Main_Window.AbsoluteSize.Y)
                 window_size_func(v2(Main_Window.AbsoluteSize.X, Main_Window.AbsoluteSize.Y))
             else
                 if UI_Toggled then
                     ScalingSideY.Visible = false
                     ScalingSideX.Visible = false
+
+                    coroutine.wrap(function()
+                        repeat wait() until not UI_Toggled and not UI_Hid
+                        RS:BindToRenderStep("CScaling", 1, Scaling_Connection)
+                    end)()
+                    RS:UnbindFromRenderStep("CScaling")
                 else
                     ScalingSideY.Visible = true
                     ScalingSideX.Visible = true
                 end
             end
-        end)
+        end
+        RS:BindToRenderStep("CScaling", 1, Scaling_Connection)
     end
 
     local Notifications = new("Frame")
@@ -915,17 +924,7 @@ Library.NewWindow = function(project_name, ui_info)
                 Slider_Value.Size = u2(0, 30, 1, 0)
                 Slider_Value.ZIndex = 5
                 Slider_Value.Font = Enum.Font.SourceSans
-                
-                if decimals > 1 then
-                    local str = "1"
-                    for i = 1, decimals do 
-                        str = str.."0"
-                    end
-                    Slider_Value.Text = round(info.default * tonumber(str))/tonumber(str)..tostring(suffix)
-                else 
-                    Slider_Value.Text = info.default..tostring(suffix)  
-                end
-
+                Slider_Value.Text = current_value..tostring(suffix)  
                 Slider_Value.TextColor3 = RGB(238, 238, 255)
                 Slider_Value.TextSize = 14.000
                 Slider_Value.TextXAlignment = Enum.TextXAlignment.Right
@@ -934,10 +933,10 @@ Library.NewWindow = function(project_name, ui_info)
                 Detector.MouseButton1Down:Connect(function()
                     Dragging = true
                 end)
-                local connection
-                connection = UIS.InputEnded:Connect(function(input)
+                local c_up
+                c_up = UIS.InputEnded:Connect(function(input)
                     if DESTROY_GUI then
-                        connection:Disconnect()
+                        c_up:Disconnect()
                     elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
                         Dragging = false
                     end
@@ -1312,23 +1311,6 @@ Library.NewWindow = function(project_name, ui_info)
                     Value3.Text = "255"
                 end
 
-                Detector.MouseButton1Click:Connect(function()
-                    PickerFrame.Visible = not PickerFrame.Visible
-                end)
-
-                local detect_inside
-                detect_inside = UIS.InputBegan:Connect(function(input, gameProcessed)
-                    if DESTROY_GUI then
-                        detect_inside:Disconnect()
-                    elseif not gameProcessed then
-                        if input.UserInputType == Enum.UserInputType.MouseButton2 and PickerFrame.Visible == true and MouseIn(PickerFrame) == false then
-                            PickerFrame.Visible = false
-                        elseif input.UserInputType == Enum.UserInputType.MouseButton1 and PickerFrame.Visible == true and MouseIn(Detector) == false and MouseIn(PickerFrame) == false then
-                            PickerFrame.Visible = false
-                        end
-                    end
-                end)
-
                 local previous = nil
 
                 local function PlaceColor(col) -- RGB Color
@@ -1427,7 +1409,7 @@ Library.NewWindow = function(project_name, ui_info)
                 end)
                 
                 local colorpicker_c
-                colorpicker_c = RS.RenderStepped:Connect(function()
+                colorpicker_c = function()
                     if DESTROY_GUI then
                         colorpicker_c:Disconnect()
                     else
@@ -1445,6 +1427,31 @@ Library.NewWindow = function(project_name, ui_info)
                             local v1 = (HSVBox.AbsoluteSize.Y - (Cursor.AbsolutePosition.Y - HSVBox.AbsolutePosition.Y)) / HSVBox.AbsoluteSize.Y
                             Cursor.Position = u2(0, clamp(Mouse.X - HSVBox.AbsolutePosition.X, Cursor.AbsoluteSize.X/2, HSVBox.AbsoluteSize.X - Cursor.AbsoluteSize.X), 0, clamp(Mouse.Y - HSVBox.AbsolutePosition.Y, Cursor.AbsoluteSize.Y/2, HSVBox.AbsoluteSize.Y - Cursor.AbsoluteSize.Y))
                             PlaceColorHSV({h = h1, s = s1, v = v1})
+                        end
+                    end
+                end
+
+                Detector.MouseButton1Click:Connect(function()
+                    PickerFrame.Visible = not PickerFrame.Visible
+
+                    if PickerFrame.Visible then
+                        RS:BindToRenderStep("CPBinding", 1, colorpicker_c)
+                    else
+                        RS:UnbindFromRenderStep("CPBinding")
+                    end
+                end)
+
+                local detect_inside
+                detect_inside = UIS.InputBegan:Connect(function(input, gameProcessed)
+                    if DESTROY_GUI then
+                        detect_inside:Disconnect()
+                    elseif not gameProcessed then
+                        if input.UserInputType == Enum.UserInputType.MouseButton2 and PickerFrame.Visible == true and MouseIn(PickerFrame) == false then
+                            PickerFrame.Visible = false
+                            RS:UnbindFromRenderStep("CPBinding")
+                        elseif input.UserInputType == Enum.UserInputType.MouseButton1 and PickerFrame.Visible == true and MouseIn(Detector) == false and MouseIn(PickerFrame) == false then
+                            PickerFrame.Visible = false
+                            RS:UnbindFromRenderStep("CPBinding")
                         end
                     end
                 end)
